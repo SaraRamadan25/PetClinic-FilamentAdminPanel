@@ -31,7 +31,6 @@ class OwnerResource extends Resource
                     Forms\Components\TextInput::make('phone')
                         ->required()
                         ->tel(),
-
             ])
             ]);
     }
