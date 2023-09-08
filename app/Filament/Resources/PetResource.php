@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Enums\PetType;
 use App\Filament\Resources\PetResource\Pages;
-use App\Filament\Resources\PetResource\RelationManagers;
 use App\Models\Pet;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -63,7 +62,9 @@ class PetResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                 ->sortable()
                 ->searchable(),
-                Tables\Columns\TextColumn::make('type'),
+                Tables\Columns\TextColumn::make('type')
+                ->sortable()
+                ->searchable(),
                 Tables\Columns\TextColumn::make('date_of_birth')
                  ->date('F j, Y')
                 ->sortable(),
