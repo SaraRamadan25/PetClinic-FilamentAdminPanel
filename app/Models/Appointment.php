@@ -13,7 +13,7 @@ class Appointment extends Model
     use HasFactory;
 
     protected $casts = [
-        'status'=>AppointmentStatus::class
+        'status' => AppointmentStatus::class
     ];
     public function pet(): BelongsTo
     {

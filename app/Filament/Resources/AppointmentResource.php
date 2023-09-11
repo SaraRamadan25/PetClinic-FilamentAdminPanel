@@ -4,15 +4,12 @@ namespace App\Filament\Resources;
 
 use App\Enums\AppointmentStatus;
 use App\Filament\Resources\AppointmentResource\Pages;
-use App\Filament\Resources\AppointmentResource\RelationManagers;
 use App\Models\Appointment;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class AppointmentResource extends Resource
 {
@@ -91,7 +88,7 @@ class AppointmentResource extends Resource
                         $record->status = AppointmentStatus::Confirmed;
                         $record->save();
                     })
-            ->visible(fn (Appointment $record) =>$record->status == AppointmentStatus::Created)
+            ->visible(fn (Appointment $record) => $record->status == AppointmentStatus::Created)
                 ->color('success')
                 ->icon('heroicon-s-check-circle'),
                 Tables\Actions\Action::make('Cancel')
@@ -101,7 +98,7 @@ class AppointmentResource extends Resource
                     })
                     ->color('danger')
                     ->icon('heroicon-o-x-mark')
-                    ->visible(fn (Appointment $record) =>$record->status !==  AppointmentStatus::Canceled),
+                    ->visible(fn (Appointment $record) => $record->status !==  AppointmentStatus::Canceled),
                 Tables\Actions\EditAction::make(),
             ])
 
