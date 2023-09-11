@@ -26,11 +26,7 @@ class User extends Authenticatable implements HasTenants, FilamentUser
      *
      * @var array<int, string>
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+   protected $guarded = [];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -54,6 +50,10 @@ class User extends Authenticatable implements HasTenants, FilamentUser
     public function clinics(): BelongsToMany
     {
         return $this->belongsToMany(Clinic::class);
+    }
+    public function clinic(): BelongsToMany
+    {
+        return $this->clinics();
     }
     public function role(): BelongsTo
     {
