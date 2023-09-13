@@ -70,6 +70,10 @@ class User extends Authenticatable implements HasTenants, FilamentUser
     }
     public function canAccessPanel(Panel $panel): bool
     {
-        return true;
+        $role = auth()->user()->role->name;
+        return match ($panel->getId()){
+            'admin' => $role === 'admin' || $role === 'doctor',
+            'owner'=> $role === 'owner'|| $role === 'admin',
+        };
     }
 }

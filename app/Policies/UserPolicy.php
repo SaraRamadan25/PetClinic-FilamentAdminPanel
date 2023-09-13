@@ -15,7 +15,6 @@ class UserPolicy
     {
         return auth()->user()->role->name === 'admin';
     }
-
     public function update(): bool
     {
         return auth()->user()->role->name === 'admin';
@@ -24,7 +23,6 @@ class UserPolicy
     {
         return auth()->user()->role->name === 'admin';
     }
-
     public function delete(): bool
     {
         return auth()->user()->role->name === 'admin';
