@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Clinic extends Model
 {
+    protected $guarded = [];
     use HasFactory;
 
     public function users(): BelongsToMany
