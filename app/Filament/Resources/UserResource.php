@@ -23,58 +23,60 @@ class UserResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make([ Forms\Components\Select::make('role_id')
-                    ->relationship('role', 'name')
-                    ->preload()
-                    ->required(),
+                Forms\Components\Section::make([
                     Forms\Components\TextInput::make('name')
-                        ->required()
-                        ->maxLength(255),
+                        ->required(),
                     Forms\Components\TextInput::make('email')
                         ->email()
-                        ->required()
-                        ->maxLength(255),
+                        ->required(),
                     Forms\Components\TextInput::make('phone')
-                    ->required()
-                    ->tel(),
+                        ->tel()
+                        ->required(),
+                    Forms\Components\Select::make('role_id')
+                        ->native(false)
+                        ->preload()
+                        ->relationship('role', 'name')
+                        ->required(),
+                    Forms\Components\Select::make('clinics')
+                        ->native(false)
+                        ->required()
+                        ->multiple()
+                        ->preload()
+                        ->relationship(name: null, titleAttribute: 'name'),
                     Forms\Components\TextInput::make('password')
                         ->password()
-                        ->required()
                         ->dehydrateStateUsing(fn ($state) => Hash::make($state))
                         ->dehydrated(fn ($state) => filled($state))
                         ->required(fn (string $context): bool => $context === 'create'),
-                    Forms\Components\Select::make('clinics')
-                        ->relationship('clinics', 'name')
-                        ->multiple()
-                        ->preload()
-                        ->required()
-               ])
+                ])
             ]);
-
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('role.name')
-                    ->numeric()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('name')
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('phone')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('clinics.name')
-            ->badge()
-            ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('role.name')
+                    ->badge()
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('clinics.name')
+                    ->badge()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->dateTime('M d Y h:i A')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
@@ -83,6 +85,7 @@ class UserResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -109,8 +112,9 @@ class UserResource extends Resource
             'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
     }
+
     public static function shouldRegisterNavigation(): bool
     {
-        return auth()->user()->role->name === 'Admin';
+        return auth()->user()->role->name == 'admin';
     }
 }

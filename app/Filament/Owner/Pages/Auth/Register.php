@@ -16,16 +16,15 @@ class Register extends BaseRegisterPage
 {
     public function form(Form $form): Form
     {
-        return $form
-            ->schema([
-             $this->getNameFormComponent(),
+        return $form->schema([
+            $this->getNameFormComponent(),
             $this->getEmailFormComponent(),
-                Forms\Components\TextInput::make('phone')
+            Forms\Components\TextInput::make('phone')
                 ->required()
                 ->tel(),
             $this->getPasswordFormComponent(),
-            $this->getPasswordConfirmationFormComponent(),
-            ])
+            $this->getPasswordConfirmationFormComponent()
+        ])
             ->statePath('data');
     }
 
@@ -50,7 +49,9 @@ class Register extends BaseRegisterPage
         }
 
         $data = $this->form->getState();
-        $data['role_id'] = Role::where('name', 'owner')->first()->id;
+
+        $data['role_id'] = Role::whereName('owner')->first()->id;
+
         $user = $this->getUserModel()::create($data);
 
         app()->bind(
@@ -65,5 +66,4 @@ class Register extends BaseRegisterPage
 
         return app(RegistrationResponse::class);
     }
-
 }

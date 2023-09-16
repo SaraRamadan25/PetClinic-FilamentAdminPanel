@@ -25,9 +25,9 @@ class OwnerPanelProvider extends PanelProvider
     {
         return $panel
             ->id('owner')
-            ->registration(Register::class)
-            ->login()
             ->path('owner')
+            ->login()
+            ->registration(Register::class)
             ->colors([
                 'primary' => Color::Amber,
             ])

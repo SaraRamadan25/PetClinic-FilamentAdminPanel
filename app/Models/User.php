@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasTenants;
 use Filament\Panel;
@@ -26,7 +27,11 @@ class User extends Authenticatable implements HasTenants, FilamentUser
      *
      * @var array<int, string>
      */
-    protected $guarded = [];
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+    ];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -47,33 +52,39 @@ class User extends Authenticatable implements HasTenants, FilamentUser
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
     public function clinics(): BelongsToMany
     {
         return $this->belongsToMany(Clinic::class);
     }
-    public function clinic(): BelongsToMany
-    {
-        return $this->clinics();
-    }
+
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);
+    }
+
+    public function clinic(): BelongsToMany
+    {
+        return $this->clinics();
     }
 
     public function getTenants(Panel $panel): array|Collection
     {
         return $this->clinics;
     }
+
     public function canAccessTenant(Model $tenant): bool
     {
         return $this->clinics->contains($tenant);
     }
+
     public function canAccessPanel(Panel $panel): bool
     {
         $role = auth()->user()->role->name;
-        return match ($panel->getId()){
+
+        return match($panel->getId()) {
             'admin' => $role === 'admin' || $role === 'doctor',
-            'owner'=> $role === 'owner'|| $role === 'admin',
+            'owner' => $role === 'admin' || $role === 'owner',
         };
     }
 }
