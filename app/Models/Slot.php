@@ -9,14 +9,19 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Slot extends Model
 {
+    protected $guarded = [];
+    protected $casts = [
+        'start' => 'datetime',
+        'end' => 'datetime',
+    ];
     use HasFactory;
 
-    public function appointments(): HasMany
+    public function appointment(): HasMany
     {
         return $this->hasMany(Appointment::class);
     }
     public function owner(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'owner_id');
+        return $this->belongsTo(Schedule::class);
     }
 }
