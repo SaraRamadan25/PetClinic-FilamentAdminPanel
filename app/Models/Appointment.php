@@ -28,4 +28,8 @@ class Appointment extends Model
     {
         return $this->belongsTo(Slot::class);
     }
+    public function doctor(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 }

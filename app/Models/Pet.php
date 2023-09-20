@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Pet extends Model
 {
+    protected $guarded = [];
     use HasFactory;
 
     protected $casts = [

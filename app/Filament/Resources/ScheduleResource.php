@@ -62,7 +62,7 @@ class ScheduleResource extends Resource
             ->groups([
                 Tables\Grouping\Group::make('date')
                     ->collapsible()
-                    ->getTitleFromRecordUsing(fn (Schedule $record) => Carbon::parse($record->date)->format('M d, Y'))
+                    ->getTitleFromRecordUsing(fn (Schedule $record) => $record->date->format('M d, Y'))
             ])
             ->defaultGroup('date')
             ->groupsInDropdownOnDesktop()
@@ -76,7 +76,7 @@ class ScheduleResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('slots')
                     ->badge()
-                    ->formatStateUsing(fn (Slot $state) => Carbon::parse($state->start)->format('h:i A') . ' - ' . Carbon::parse($state->end)->format('h:i A')),
+                    ->formatStateUsing(fn (Slot $state) => $state->start->format('h:i A') . ' - ' . $state->end->format('h:i A')),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

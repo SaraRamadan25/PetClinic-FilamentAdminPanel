@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Enums\PetType;
 use App\Filament\Resources\PetResource\Pages;
 use App\Models\Pet;
 use Filament\Forms;
@@ -10,45 +9,49 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use App\Enums\PetType;
 use Illuminate\Support\Facades\Storage;
 
 class PetResource extends Resource
 {
     protected static ?string $model = Pet::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-heart';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\Section::make([
-                    Forms\Components\TextInput::make('name')->required(),
                     Forms\Components\FileUpload::make('avatar')
-                    ->imageEditor(),
+                        ->image()
+                        ->imageEditor(),
+                    Forms\Components\TextInput::make('name')
+                        ->required(),
                     Forms\Components\DatePicker::make('date_of_birth')
                         ->native(false)
-                        ->required(),
+                        ->required()
+                        ->displayFormat('M d Y'),
                     Forms\Components\Select::make('type')
-            ->native(false)
-            ->options(PetType::class),
+                        ->native(false)
+                        ->options(PetType::class),
                     Forms\Components\Select::make('owner_id')
                         ->relationship('owner', 'name')
-                        ->required()
-                    ->native(false)
-                    ->searchable()
-                    ->preload()
-                    ->createOptionForm([ Forms\Components\Section::make([
-                        Forms\Components\TextInput::make('name')->required(),
-                        Forms\Components\TextInput::make('email')
-                            ->required()
-                            ->email(),
-                        Forms\Components\TextInput::make('phone')
-                            ->required()
-                            ->tel(),
-                    ]),
-                ]),
-            ]),
+                        ->native(false)
+                        ->searchable()
+                        ->preload()
+                        ->createOptionForm([
+                            Forms\Components\TextInput::make('name')
+                                ->required(),
+                            Forms\Components\TextInput::make('email')
+                                ->email()
+                                ->required(),
+                            Forms\Components\TextInput::make('phone')
+                                ->tel()
+                                ->required(),
+                        ])
+
+                ])
             ]);
     }
 
@@ -59,17 +62,18 @@ class PetResource extends Resource
                 Tables\Columns\ImageColumn::make('avatar')
                     ->circular(),
                 Tables\Columns\TextColumn::make('name')
-                ->sortable()
-                ->searchable(),
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('type')
-                ->sortable()
-                ->searchable(),
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('date_of_birth')
-                 ->date('F j, Y')
-                ->sortable(),
+                    ->date('M d Y')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('owner.name')
-                ->sortable()
-                ->searchable(),
+                    ->sortable()
+                    ->searchable()
+
             ])
             ->filters([
                 //
@@ -77,9 +81,10 @@ class PetResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()
-                ->before(function (Pet $record) {
-                    Storage::delete('public/'.$record->avatar);
-                })
+                    ->before(function (Pet $record) {
+                        // Delete file
+                        Storage::delete('public/' . $record->avatar);
+                    })
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

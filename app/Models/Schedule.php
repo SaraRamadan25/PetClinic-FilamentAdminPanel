@@ -11,7 +11,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Schedule extends Model
 {
     protected $guarded = [];
+
     use HasFactory;
+
+    protected $casts = [
+        'date' => 'datetime',
+    ];
 
     public function owner(): BelongsTo
     {
