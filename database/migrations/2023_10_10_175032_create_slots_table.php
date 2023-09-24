@@ -17,7 +17,7 @@ return new class () extends Migration {
             $table->time('start');
             $table->time('end');
             $table->foreignIdFor(Schedule::class);
-            $table->string('status')->default('available')->change();
+            $table->string('status')->default('available');
             $table->timestamps();
         });
     }

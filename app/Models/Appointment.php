@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Appointment extends Model
 {
+    protected $guarded = [];
+
     use HasFactory;
 
     protected $casts = [
@@ -18,10 +20,6 @@ class Appointment extends Model
     public function pet(): BelongsTo
     {
         return $this->belongsTo(Pet::class);
-    }
-    public function clinic(): BelongsToMany
-    {
-        return $this->belongsToMany(Clinic::class);
     }
 
     public function slot(): BelongsTo

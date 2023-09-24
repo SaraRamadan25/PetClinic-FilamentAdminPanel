@@ -25,11 +25,7 @@ class Schedule extends Model
 
     public function slots(): HasMany
     {
-        return $this->hasMany(Slot::class);
+        return $this->hasMany(Slot::class,'schedule_id');
     }
 
-    public function clinic(): BelongsToMany
-    {
-        return $this->belongsToMany(Clinic::class);
-    }
 }

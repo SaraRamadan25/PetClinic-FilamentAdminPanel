@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Slot;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,14 +14,12 @@ return new class () extends Migration {
         Schema::create('appointments', function (Blueprint $table) {
             $table->id();
             $table->text('description');
-            $table->string('status')->default('created');
             $table->foreignId('pet_id')
                 ->constrained('pets')
                 ->cascadeOnDelete();
 
-            $table->foreignId('slot_id')
-                ->constrained('slots');
-
+            $table->foreignIdFor(Slot::class);
+            $table->string('status')->default('created');
             $table->timestamps();
         });
     }

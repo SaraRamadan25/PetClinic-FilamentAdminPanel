@@ -7,11 +7,13 @@ use App\Filament\Resources\AppointmentResource\Pages;
 use App\Models\Appointment;
 use App\Models\Role;
 use App\Models\Slot;
+use App\Models\User;
 use Carbon\Carbon;
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -37,25 +39,38 @@ class AppointmentResource extends Resource
                         ->required(),
                     Forms\Components\DatePicker::make('date')
                         ->native(false)
+                        ->closeOnDateSelection()
                         ->required()
-                        ->live(),
-                    Forms\Components\Select::make('doctor_id')
-                        ->options(function (Get $get) use ($doctorRole) {
-                            return Filament::getTenant()
-                                ->users()
-                                ->whereBelongsTo($doctorRole)
-                                ->whereHas('schedules', function (Builder $query) use ($get) {
-                                    $query->where('date', $get('date'));
-                                })
-                                ->get()
-                                ->pluck('name', 'id');
-                        })
+                        ->live()
+                        ->afterStateUpdated(fn (Set $set) => $set('doctor', null)),
+                    Forms\Components\Select::make('owner_id')
                         ->native(false)
-                        ->hidden(fn (Get $get) => blank($get('date'))),
+                        ->label('Doctor')
+                        ->options(
+                            User::whereBelongsTo($doctorRole)
+                                ->get()
+                                ->pluck('name', 'id')
+                        )
+                        ->required()
+                        ->native(false)
+                        ->hidden(fn (Get $get) => blank($get('date')))
+                        ->live()
+                        ->afterStateUpdated(fn (Set $set) => $set('slot_id', null)),
                     Forms\Components\Select::make('slot_id')
                         ->native(false)
-                        ->relationship(name:'slot', titleAttribute: 'start')
-                        ->getOptionLabelFromRecordUsing(fn (Slot $record) => $record->start->format('h:i A')),
+                        ->required()
+                        ->relationship(
+                            name:'slot',
+                            titleAttribute: 'start',
+                            modifyQueryUsing: function (Builder $query, Get $get) {
+                                $doctor = User::find($get('doctor'));
+                                $query->whereHas('schedule', function (Builder $query) use ($doctor) {
+                                    $query->whereBelongsTo($doctor, 'owner');
+                                });
+                            }
+                        )
+                        ->hidden(fn (Get $get) => blank($get('doctor')))
+                        ->getOptionLabelFromRecordUsing(fn (Slot $record) => $record->formatted_time),
                     Forms\Components\TextInput::make('description')
                         ->required(),
                     Forms\Components\Select::make('status')
@@ -76,16 +91,16 @@ class AppointmentResource extends Resource
                 Tables\Columns\TextColumn::make('description')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('date')
-                    ->date('M d Y')
+                Tables\Columns\TextColumn::make('slot.schedule.owner.name')
+                    ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('start')
-                    ->time('h:i A')
-                    ->label('From')
+                Tables\Columns\TextColumn::make('slot.schedule.date')
+                    ->label('Date')
+                    ->date('M d, Y')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('end')
-                    ->time('h:i A')
-                    ->label('To')
+                Tables\Columns\TextColumn::make('slot.formatted_time')
+                    ->label('Time')
+                    ->badge()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
