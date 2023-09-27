@@ -10,13 +10,20 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Appointment extends Model
 {
-    protected $guarded = [];
-
     use HasFactory;
+
+    protected static $unguarded = false;
+
+    public $fillable = [
+        'pet_id',
+        'slot_id',
+        'description'
+    ];
 
     protected $casts = [
         'status' => AppointmentStatus::class
     ];
+
     public function pet(): BelongsTo
     {
         return $this->belongsTo(Pet::class);
@@ -25,9 +32,5 @@ class Appointment extends Model
     public function slot(): BelongsTo
     {
         return $this->belongsTo(Slot::class);
-    }
-    public function doctor(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
     }
 }

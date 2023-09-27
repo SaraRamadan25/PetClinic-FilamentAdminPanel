@@ -17,7 +17,6 @@ return new class () extends Migration {
             $table->foreignId('pet_id')
                 ->constrained('pets')
                 ->cascadeOnDelete();
-
             $table->foreignIdFor(Slot::class);
             $table->string('status')->default('created');
             $table->timestamps();

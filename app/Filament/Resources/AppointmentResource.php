@@ -4,80 +4,35 @@ namespace App\Filament\Resources;
 
 use App\Enums\AppointmentStatus;
 use App\Filament\Resources\AppointmentResource\Pages;
+use App\Filament\Resources\AppointmentResource\RelationManagers;
 use App\Models\Appointment;
-use App\Models\Role;
-use App\Models\Slot;
-use App\Models\User;
-use Carbon\Carbon;
-use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class AppointmentResource extends Resource
 {
     protected static ?string $model = Appointment::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-calendar-days';
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
     {
-        $doctorRole = Role::whereName('doctor')->first();
-
         return $form
             ->schema([
-                Forms\Components\Section::make([
-                    Forms\Components\Select::make('pet_id')
-                        ->relationship('pet', 'name')
-                        ->searchable()
-                        ->preload()
-                        ->required(),
-                    Forms\Components\DatePicker::make('date')
-                        ->native(false)
-                        ->closeOnDateSelection()
-                        ->required()
-                        ->live()
-                        ->afterStateUpdated(fn (Set $set) => $set('doctor', null)),
-                    Forms\Components\Select::make('owner_id')
-                        ->native(false)
-                        ->label('Doctor')
-                        ->options(
-                            User::whereBelongsTo($doctorRole)
-                                ->get()
-                                ->pluck('name', 'id')
-                        )
-                        ->required()
-                        ->native(false)
-                        ->hidden(fn (Get $get) => blank($get('date')))
-                        ->live()
-                        ->afterStateUpdated(fn (Set $set) => $set('slot_id', null)),
-                    Forms\Components\Select::make('slot_id')
-                        ->native(false)
-                        ->required()
-                        ->relationship(
-                            name:'slot',
-                            titleAttribute: 'start',
-                            modifyQueryUsing: function (Builder $query, Get $get) {
-                                $doctor = User::find($get('doctor'));
-                                $query->whereHas('schedule', function (Builder $query) use ($doctor) {
-                                    $query->whereBelongsTo($doctor, 'owner');
-                                });
-                            }
-                        )
-                        ->hidden(fn (Get $get) => blank($get('doctor')))
-                        ->getOptionLabelFromRecordUsing(fn (Slot $record) => $record->formatted_time),
-                    Forms\Components\TextInput::make('description')
-                        ->required(),
-                    Forms\Components\Select::make('status')
-                        ->native(false)
-                        ->options(AppointmentStatus::class)
-                        ->visibleOn(Pages\EditAppointment::class)
-                ])
+                Forms\Components\Select::make('pet_id')
+                    ->relationship('pet', 'name')
+                    ->required(),
+                Forms\Components\Textarea::make('description')
+                    ->required()
+                    ->maxLength(65535),
+                Forms\Components\Select::make('slot_id')
+                    ->relationship('slot', 'start')
+                    ->required(),
             ]);
     }
 
