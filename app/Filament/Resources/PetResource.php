@@ -16,7 +16,7 @@ class PetResource extends Resource
 {
     protected static ?string $model = Pet::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-heart';
+    protected static ?string $navigationIcon = 'heroicon-s-building-office';
 
     public static function form(Form $form): Form
     {
